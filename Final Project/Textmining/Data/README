@@ -2,3 +2,5 @@ The kancellibøger were too large in size to upload to GitHub normally.
 
 Data for text-mining:
 https://silo1.sciencedata.dk/shared/0f268c26107b4b3adfcc165a620df00c?fbclid=IwY2xjawR5EMpleHRuA2FlbQIxMABicmlkETBLc3ZKTzhmOXBvczRDd3NUc3J0YwZhcHBfaWQQMjIyMDM5MTc4ODIwMDg5MgABHsyp4VPN5Wc_3rhzRnAsQ1jgDDBr_nY2KUoHfOXkanKMBfnD3o71cKQFSKDK_aem_JKPfZoc_yfcMik8odq-9WA
+
+Remember to put the downloaded files into a 'data' folder in the working directory in R. Otherwise it won't work.
