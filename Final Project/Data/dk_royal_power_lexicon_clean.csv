@@ -1,0 +1,160 @@
+word,sentiment,score,dimension,notes
+kongen,neutral,0,authority,the king
+kongens,neutral,0,authority,the king's
+kronen,positive,1,authority,the Crown
+krone,positive,1,authority,crown
+majestæt,positive,1,authority,majesty
+kongelig,positive,1,authority,royal
+rigsraad,negative,-2,decentralization,the Council of the Realm
+rigsraaderne,negative,-1,decentralization,members of the Council of the Realm
+
+myndighed,positive,1,authority,authority
+magt,positive,1,authority,power
+herredømme,positive,1,authority,dominion
+bemyndige,positive,1,authority,to authorize
+fuldmagt,positive,1,authority,full authority
+mandat,positive,1,authority,mandate
+kancelliet,positive,2,centralization,the Chancellery
+befaling,positive,1,centralization,command
+befale,positive,1,centralization,to command
+befalet,positive,1,centralization,commanded
+ordre,positive,2,centralization,order
+instruks,positive,1,centralization,instruction
+tilsyn,positive,2,centralization,supervision
+opsynsmand,positive,1,centralization,overseer
+kontrol,positive,1,centralization,control
+regnskab,positive,2,centralization,account
+indsende,positive,1,centralization,to submit/send in (to central authority)
+register,positive,1,centralization,register
+sekretær,positive,1,centralization,secretary
+embedsmand,positive,2,centralization,office-holder
+centralt,positive,1,centralization,centrally
+patent,positive,1,centralization,patent
+bevilget,positive,1,centralization,granted
+tilladelse,positive,1,centralization,permission
+tillade,positive,1,centralization,to permit
+lensmand,positive,1,administration,len-holder
+lensmænd,positive,1,administration,len-holders (plural)
+befalingsmand,neutral,0,administration,commandant
+embedsmand,neutral,0,administration,official
+foged,neutral,0,administration,bailiff
+herredsfoged,neutral,0,administration,district bailiff
+fogd,neutral,0,administration,bailiff (variant spelling)
+borgemestre,neutral,0,administration,burgomasters
+raad,neutral,0,administration,council
+raadhus,neutral,0,administration,town hall
+gouverneur,neutral,0,administration,governor
+statholder,neutral,0,administration,stadholder
+supplik,neutral,0,administration,supplication
+erklæring,neutral,0,administration,declaration
+brev,neutral,0,administration,letter
+herred,neutral,0,decentralization,hundred
+birk,neutral,0,decentralization,birk
+stænder,neutral,0,decentralization,estates (of the realm)
+adel,negative,-1,decentralization,nobility
+adelsmand,negative,-1,decentralization,nobleman
+frihed,neutral,0,decentralization,freedom
+fritagelse,neutral,0,decentralization,exemption
+fritaget,positive,1,decentralization,exempted
+privilegier,neutral,0,decentralization,privileges
+privilegium,neutral,0,decentralization,privilege
+undtagelse,positive,1,decentralization,exception
+selvstyre,negative,-2,decentralization,self-government
+selvstændig,negative,-1,decentralization,independent
+fritagelsesbrev,positive,2,centralization,letter of exemption
+lokalt,neutral,0,decentralization,locally
+lydig,positive,1,governance,obedient
+lydighed,positive,2,governance,obedience
+tro,neutral,0,governance,faithful
+trofast,positive,2,governance,faithful
+troskab,positive,2,governance,faithfulness
+ærlig,neutral,0,governance,honourable
+flittig,positive,1,governance,diligent
+flid,positive,1,governance,diligence
+tjeneste,positive,1,governance,service (to the king/state)
+ansvar,neutral,0,governance,responsibility
+ulydighed,negative,-2,resistance,disobedience
+opsætsig,negative,-2,resistance,contumacious
+oprør,negative,-2,resistance,uprising
+modstand,negative,-1,resistance,resistance
+unddrage,negative,-1,resistance,to evade
+nægte,negative,-1,resistance,to refuse
+negte,negative,-1,resistance,to refuse (variant spelling)
+rebel,negative,-2,resistance,rebel
+oprører,negative,-2,resistance,rebel
+forbudt,neutral,0,resistance,forbidden
+forbud,neutral,0,resistance,prohibition
+forbyde,positive,1,governance,to forbid
+ulydig,negative,-2,resistance,disobedient
+straf,positive,1,coercion,punishment
+straffe,positive,1,coercion,to punish
+bøde,positive,1,coercion,fine
+fængsel,neutral,0,coercion,imprisonment
+fængsle,positive,1,coercion,to imprison
+afsætte,positive,1,coercion,to dismiss
+afsætning,positive,1,coercion,dismissal
+tvang,neutral,0,coercion,coercion
+overlast,neutral,0,coercion,abuse of power
+konfiskere,positive,1,coercion,to confiscate
+skat,positive,1,financial,tax
+afgift,positive,1,financial,duty
+landgilde,negative,-2,financial,land rent paid by tenant farmers
+told,positive,1,financial,customs duty
+toldere,positive,2,financial,toll collectors
+tiende,positive,1,financial,tithe
+restancer,negative,-2,financial,arrears
+gæld,negative,-1,financial,debt
+rente,neutral,0,financial,interest
+oppebørsel,neutral,0,financial,collection of revenue
+laan,neutral,0,financial,loan
+pengemangel,negative,-1,financial,lack of money
+skatterestance,negative,-2,financial,tax arrears
+betale,positive,1,financial,to pay
+indbetale,positive,1,financial,to pay in
+dom,neutral,0,justice,judgement
+lov,positive,1,justice,law
+ret,positive,1,justice,right
+retfærdighed,positive,0,justice,justice
+rettergang,positive,1,justice,legal proceedings
+proces,neutral,0,justice,lawsuit
+stævne,neutral,0,justice,to summon
+klage,neutral,0,justice,complaint
+uret,negative,-2,justice,injustice
+beklage,negative,-1,justice,to complain
+appel,neutral,0,justice,appeal
+sandemænd,neutral,0,justice,jury of sworn men
+naade,positive,1,governance,grace
+naadig,positive,1,governance,gracious
+gunst,neutral,0,governance,favour
+begunstige,positive,1,governance,to favour
+hjælp,positive,1,governance,help
+behjælpelig,positive,1,governance,helpful
+forskaansel,positive,1,governance,indulgence
+fornøjelig,positive,1,governance,satisfactory
+gavnlig,positive,1,governance,beneficial
+velfærd,neutral,0,governance,welfare
+skade,negative,-1,governance,harm
+vilkaarlighed,negative,-2,governance,arbitrariness
+undertrykkelse,positive,1,governance,oppression
+tyranni,negative,-2,governance,tyranny
+uorden,negative,-1,governance,disorder
+forsømmelse,negative,-1,governance,neglect
+efterladenhed,negative,-1,governance,negligence
+svig,negative,-2,governance,fraud
+bedrageri,negative,-2,governance,fraud
+krigsfolk,positive,1,authority,soldiers
+orlogsskib,positive,1,authority,warship
+fæstning,positive,1,authority,fortress
+slot,positive,1,authority,castle
+besætning,positive,1,authority,garrison
+rytter,positive,1,authority,cavalry
+soldat,positive,1,authority,soldier
+præst,neutral,0,administration,priest
+kirke,neutral,0,administration,church
+kloster,neutral,0,administration,monastery/convent (often royal property)
+biskop,negative,-2,administration,bishop
+reformation,neutral,0,administration,Reformation
+konsumption,positive,1,financial,consumption
+accise,positive,1,financial,excise duty
+stï¿½nderforsamling,negative,-2,decentralization,estates meeting
+landkommissï¿½r,negative,-2,decentralization,land commissioner
