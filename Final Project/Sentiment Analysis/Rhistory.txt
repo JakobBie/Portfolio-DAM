@@ -1,0 +1,512 @@
+library(readr)
+library(stringr)
+library(knitr)
+PDF_PATH_1636     <- here("data","KB 1636-60.pdf")             # <-- full path to your PDF
+LEXICON_PATH  <- here("data", "dk_royal_power_lexicon_clean.csv")  # <-- full path to the lexicon CSV
+pdf_pages_1636 <- pdf_text(PDF_PATH_1636)
+cat("Pages found:", length(pdf_pages_1636), "\n")
+cat("Approx. word count:",
+pdf_pages_1636 %>% paste(collapse = " ") %>% str_count("\\S+"), "\n")
+# Combine all pages into one document
+full_text <- tibble(
+unit_id = 1L,
+text    = paste(pdf_pages_1636, collapse = " ")
+)
+lexicon <- read_csv(LEXICON_PATH, show_col_types = FALSE)
+cat("Lexicon entries:", nrow(lexicon), "\n")
+lexicon %>%
+count(dimension, sentiment) %>%
+pivot_wider(names_from = sentiment, values_from = n, values_fill = 0) %>%
+kable(caption = "Lexicon coverage by dimension and sentiment")
+tokens <- full_text %>%
+unnest_tokens(word, text)
+cat("Total tokens:", nrow(tokens), "\n")
+matched <- tokens %>%
+inner_join(lexicon, by = "word")
+cat("Matched tokens:", nrow(matched), "\n")
+cat("Unique matched words:", n_distinct(matched$word), "\n")
+scores <- matched %>%
+summarise(
+total_score        = sum(score, na.rm = TRUE),
+mean_score         = round(mean(score, na.rm = TRUE), 3),
+n_matches          = n(),
+n_centralization   = sum(dimension %in% c("centralization",
+"authority")),
+n_decentralization = sum(dimension %in% c("decentralization",
+"resistance")),
+n_loyalty          = sum(dimension == "governance"),
+n_resistance       = sum(dimension == "resistance"),
+n_royal_grace      = sum(dimension == "governance"),
+n_royal_punishment = sum(dimension == "coercion"),
+cent_decent_ratio  = round(n_centralization / (n_decentralization + 1), 2)
+)
+scores %>% kable(caption = "Sentiment scores across the full text")
+direction <- if (scores$total_score > 0) {
+"**centralizing** — language of royal authority dominates."
+} else if (scores$total_score < 0) {
+"**decentralizing** — language of resistance and noble autonomy dominates."
+} else {
+"**neutral** — centralizing and decentralizing language are balanced."
+}
+dim_counts <- matched %>%
+count(dimension, sentiment, sort = TRUE)
+dim_counts %>%
+kable(caption = "Matched tokens by dimension and sentiment")
+matched |>
+count(dimension) %>%
+ggplot(aes(x = reorder(dimension, n), y = n, fill = dimension)) +
+geom_col(show.legend = FALSE) +
+coord_flip() +
+labs(
+title    = "Lexicon dimension frequency",
+subtitle = "How often each thematic category appears in the text",
+x = NULL, y = "Token count"
+) +
+theme_minimal(base_size = 13)
+tibble(
+type  = c("Centralizing terms", "Decentralizing / resistant terms"),
+count = c(scores$n_centralization, scores$n_decentralization)
+) %>%
+ggplot(aes(x = type, y = count, fill = type)) +
+geom_col(width = 0.5, show.legend = FALSE) +
+scale_fill_manual(values = c("Centralizing terms"              = "#264653",
+"Decentralizing / resistant terms" = "#e9c46a")) +
+labs(
+title    = "Centralizing vs. Decentralizing vocabulary",
+subtitle = "Centralizing: centralization + authority | Decentralizing: decentralization + resistance",
+x = NULL, y = "Token count"
+) +
+theme_minimal(base_size = 13)
+tibble(
+type  = c("Loyalty to king", "Resistance to king"),
+count = c(scores$n_loyalty, scores$n_resistance)
+) %>%
+ggplot(aes(x = type, y = count, fill = type)) +
+geom_col(width = 0.5, show.legend = FALSE) +
+scale_fill_manual(values = c("Loyalty to king"    = "#2a9d8f",
+"Resistance to king" = "#e76f51")) +
+labs(
+title = "Loyalty vs. Resistance to the king",
+x = NULL, y = "Token count"
+) +
+theme_minimal(base_size = 13)
+matched %>%
+count(word, dimension, sort = TRUE) %>%
+slice_head(n = 30) %>%
+mutate(word = reorder(word, n)) %>%
+ggplot(aes(x = n, y = word, fill = dimension)) +
+geom_col() +
+labs(
+title = "Top 30 matched lexicon words",
+x = "Frequency", y = NULL, fill = "Dimension"
+) +
+theme_minimal(base_size = 12)
+matched %>%
+count(word, dimension, sentiment, score, sort = TRUE) %>%
+rename(frequency = n) %>%
+kable(caption = "All matched lexicon words and their frequencies")
+# Save all plots as PNG files
+ggsave("plot_dimensions.png",
+matched %>%
+count(dimension) %>%
+ggplot(aes(x = reorder(dimension, n), y = n, fill = dimension)) +
+geom_col(show.legend = FALSE) +
+coord_flip() +
+labs(title = "Lexicon dimension frequency",
+subtitle = "How often each thematic category appears in the text",
+x = NULL, y = "Token count") +
+theme_minimal(base_size = 13),
+width = 10, height = 6, dpi = 300)
+ggsave("plot_cent_vs_decent.png",
+tibble(
+type  = c("Centralizing terms", "Decentralizing / resistant terms"),
+count = c(scores$n_centralization, scores$n_decentralization)
+) %>%
+ggplot(aes(x = type, y = count, fill = type)) +
+geom_col(width = 0.5, show.legend = FALSE) +
+scale_fill_manual(values = c("Centralizing terms"              = "#264653",
+"Decentralizing / resistant terms" = "#e9c46a")) +
+labs(title    = "Centralizing vs. decentralizing vocabulary",
+subtitle = "Centralizing: centralization + authority | Decentralizing: decentralization + resistance",
+x = NULL, y = "Token count") +
+theme_minimal(base_size = 13),
+width = 10, height = 6, dpi = 300)
+ggsave("plot_loyalty_vs_resistance.png",
+tibble(
+type  = c("Loyalty to king", "Resistance to king"),
+count = c(scores$n_loyalty, scores$n_resistance)
+) %>%
+ggplot(aes(x = type, y = count, fill = type)) +
+geom_col(width = 0.5, show.legend = FALSE) +
+scale_fill_manual(values = c("Loyalty to king"    = "#2a9d8f",
+"Resistance to king" = "#e76f51")) +
+labs(title = "Loyalty vs. resistance to the king",
+x = NULL, y = "Token count") +
+theme_minimal(base_size = 13),
+width = 10, height = 6, dpi = 300)
+ggsave("plot_top_words.png",
+matched %>%
+count(word, dimension, sort = TRUE) %>%
+slice_head(n = 30) %>%
+mutate(word = reorder(word, n)) %>%
+ggplot(aes(x = n, y = word, fill = dimension)) +
+geom_col() +
+labs(title = "Top 30 matched lexicon words",
+x = "Frequency", y = NULL, fill = "Dimension") +
+theme_minimal(base_size = 12),
+width = 10, height = 8, dpi = 300)
+cat("Saved: plot_dimensions.png\n")
+cat("Saved: plot_cent_vs_decent.png\n")
+cat("Saved: plot_loyalty_vs_resistance.png\n")
+cat("Saved: plot_top_words.png\n")
+View(lexicon)
+knitr::opts_chunk$set(
+echo    = TRUE,
+message = FALSE,
+warning = FALSE,
+fig.width  = 10,
+fig.height = 6
+)
+library(here)
+library(pdftools)
+library(tidytext)
+library(dplyr)
+library(tidyr)
+library(ggplot2)
+library(readr)
+library(stringr)
+library(knitr)
+PDF_PATH_1636     <- here("data","KB 1636-60.pdf")             # <-- full path to your PDF
+LEXICON_PATH  <- here("data", "dk_royal_power_lexicon_clean.csv")  # <-- full path to the lexicon CSV
+pdf_pages_1636 <- pdf_text(PDF_PATH_1636)
+cat("Pages found:", length(pdf_pages_1636), "\n")
+cat("Approx. word count:",
+pdf_pages_1636 %>% paste(collapse = " ") %>% str_count("\\S+"), "\n")
+# Combine all pages into one document
+full_text <- tibble(
+unit_id = 1L,
+text    = paste(pdf_pages_1636, collapse = " ")
+)
+lexicon <- read_csv(LEXICON_PATH, show_col_types = FALSE)
+cat("Lexicon entries:", nrow(lexicon), "\n")
+lexicon %>%
+count(dimension, sentiment) %>%
+pivot_wider(names_from = sentiment, values_from = n, values_fill = 0) %>%
+kable(caption = "Lexicon coverage by dimension and sentiment")
+tokens <- full_text %>%
+unnest_tokens(word, text)
+cat("Total tokens:", nrow(tokens), "\n")
+matched <- tokens %>%
+inner_join(lexicon, by = "word")
+cat("Matched tokens:", nrow(matched), "\n")
+cat("Unique matched words:", n_distinct(matched$word), "\n")
+scores <- matched %>%
+summarise(
+total_score        = sum(score, na.rm = TRUE),
+mean_score         = round(mean(score, na.rm = TRUE), 3),
+n_matches          = n(),
+n_centralization   = sum(dimension %in% c("centralization",
+"authority")),
+n_decentralization = sum(dimension %in% c("decentralization",
+"resistance")),
+n_loyalty          = sum(dimension == "governance"),
+n_resistance       = sum(dimension == "resistance"),
+n_royal_grace      = sum(dimension == "governance"),
+n_royal_punishment = sum(dimension == "coercion"),
+cent_decent_ratio  = round(n_centralization / (n_decentralization + 1), 2)
+)
+scores %>% kable(caption = "Sentiment scores across the full text")
+direction <- if (scores$total_score > 0) {
+"**centralizing** — language of royal authority dominates."
+} else if (scores$total_score < 0) {
+"**decentralizing** — language of resistance and noble autonomy dominates."
+} else {
+"**neutral** — centralizing and decentralizing language are balanced."
+}
+dim_counts <- matched %>%
+count(dimension, sentiment, sort = TRUE)
+dim_counts %>%
+kable(caption = "Matched tokens by dimension and sentiment")
+matched |>
+count(dimension) %>%
+ggplot(aes(x = reorder(dimension, n), y = n, fill = dimension)) +
+geom_col(show.legend = FALSE) +
+coord_flip() +
+labs(
+title    = "Lexicon dimension frequency",
+subtitle = "How often each thematic category appears in the text",
+x = NULL, y = "Token count"
+) +
+theme_minimal(base_size = 13)
+tibble(
+type  = c("Centralizing terms", "Decentralizing / resistant terms"),
+count = c(scores$n_centralization, scores$n_decentralization)
+) %>%
+ggplot(aes(x = type, y = count, fill = type)) +
+geom_col(width = 0.5, show.legend = FALSE) +
+scale_fill_manual(values = c("Centralizing terms"              = "#264653",
+"Decentralizing / resistant terms" = "#e9c46a")) +
+labs(
+title    = "Centralizing vs. Decentralizing vocabulary",
+subtitle = "Centralizing: centralization + authority | Decentralizing: decentralization + resistance",
+x = NULL, y = "Token count"
+) +
+theme_minimal(base_size = 13)
+tibble(
+type  = c("Loyalty to king", "Resistance to king"),
+count = c(scores$n_loyalty, scores$n_resistance)
+) %>%
+ggplot(aes(x = type, y = count, fill = type)) +
+geom_col(width = 0.5, show.legend = FALSE) +
+scale_fill_manual(values = c("Loyalty to king"    = "#2a9d8f",
+"Resistance to king" = "#e76f51")) +
+labs(
+title = "Loyalty vs. Resistance to the king",
+x = NULL, y = "Token count"
+) +
+theme_minimal(base_size = 13)
+matched %>%
+count(word, dimension, sort = TRUE) %>%
+slice_head(n = 30) %>%
+mutate(word = reorder(word, n)) %>%
+ggplot(aes(x = n, y = word, fill = dimension)) +
+geom_col() +
+labs(
+title = "Top 30 matched lexicon words",
+x = "Frequency", y = NULL, fill = "Dimension"
+) +
+theme_minimal(base_size = 12)
+matched %>%
+count(word, dimension, sentiment, score, sort = TRUE) %>%
+rename(frequency = n) %>%
+kable(caption = "All matched lexicon words and their frequencies")
+# Save all plots as PNG files
+ggsave("plot_dimensions.png",
+matched %>%
+count(dimension) %>%
+ggplot(aes(x = reorder(dimension, n), y = n, fill = dimension)) +
+geom_col(show.legend = FALSE) +
+coord_flip() +
+labs(title = "Lexicon dimension frequency",
+subtitle = "How often each thematic category appears in the text",
+x = NULL, y = "Token count") +
+theme_minimal(base_size = 13),
+width = 10, height = 6, dpi = 300)
+ggsave("plot_cent_vs_decent.png",
+tibble(
+type  = c("Centralizing terms", "Decentralizing / resistant terms"),
+count = c(scores$n_centralization, scores$n_decentralization)
+) %>%
+ggplot(aes(x = type, y = count, fill = type)) +
+geom_col(width = 0.5, show.legend = FALSE) +
+scale_fill_manual(values = c("Centralizing terms"              = "#264653",
+"Decentralizing / resistant terms" = "#e9c46a")) +
+labs(title    = "Centralizing vs. decentralizing vocabulary",
+subtitle = "Centralizing: centralization + authority | Decentralizing: decentralization + resistance",
+x = NULL, y = "Token count") +
+theme_minimal(base_size = 13),
+width = 10, height = 6, dpi = 300)
+ggsave("plot_loyalty_vs_resistance.png",
+tibble(
+type  = c("Loyalty to king", "Resistance to king"),
+count = c(scores$n_loyalty, scores$n_resistance)
+) %>%
+ggplot(aes(x = type, y = count, fill = type)) +
+geom_col(width = 0.5, show.legend = FALSE) +
+scale_fill_manual(values = c("Loyalty to king"    = "#2a9d8f",
+"Resistance to king" = "#e76f51")) +
+labs(title = "Loyalty vs. resistance to the king",
+x = NULL, y = "Token count") +
+theme_minimal(base_size = 13),
+width = 10, height = 6, dpi = 300)
+ggsave("plot_top_words.png",
+matched %>%
+count(word, dimension, sort = TRUE) %>%
+slice_head(n = 30) %>%
+mutate(word = reorder(word, n)) %>%
+ggplot(aes(x = n, y = word, fill = dimension)) +
+geom_col() +
+labs(title = "Top 30 matched lexicon words",
+x = "Frequency", y = NULL, fill = "Dimension") +
+theme_minimal(base_size = 12),
+width = 10, height = 8, dpi = 300)
+cat("Saved: plot_dimensions.png\n")
+cat("Saved: plot_cent_vs_decent.png\n")
+cat("Saved: plot_loyalty_vs_resistance.png\n")
+cat("Saved: plot_top_words.png\n")
+View(lexicon)
+Lexicon dimension frequency
+knitr::opts_chunk$set(
+echo    = TRUE,
+message = FALSE,
+warning = FALSE,
+fig.width  = 10,
+fig.height = 6
+)
+library(here)
+library(pdftools)
+library(tidytext)
+library(dplyr)
+library(tidyr)
+library(ggplot2)
+library(readr)
+library(stringr)
+library(knitr)
+PDF_PATH_1636     <- here("data","KB 1636-60.pdf")             # <-- full path to your PDF
+LEXICON_PATH  <- here("data", "dk_royal_power_lexicon_clean.csv")  # <-- full path to the lexicon CSV
+pdf_pages_1636 <- pdf_text(PDF_PATH_1636)
+cat("Pages found:", length(pdf_pages_1636), "\n")
+cat("Approx. word count:",
+pdf_pages_1636 %>% paste(collapse = " ") %>% str_count("\\S+"), "\n")
+# Combine all pages into one document
+full_text <- tibble(
+unit_id = 1L,
+text    = paste(pdf_pages_1636, collapse = " ")
+)
+lexicon <- read_csv(LEXICON_PATH, show_col_types = FALSE)
+cat("Lexicon entries:", nrow(lexicon), "\n")
+lexicon %>%
+count(dimension, sentiment) %>%
+pivot_wider(names_from = sentiment, values_from = n, values_fill = 0) %>%
+kable(caption = "Lexicon coverage by dimension and sentiment")
+tokens <- full_text %>%
+unnest_tokens(word, text)
+cat("Total tokens:", nrow(tokens), "\n")
+matched <- tokens %>%
+inner_join(lexicon, by = "word")
+cat("Matched tokens:", nrow(matched), "\n")
+cat("Unique matched words:", n_distinct(matched$word), "\n")
+scores <- matched %>%
+summarise(
+total_score        = sum(score, na.rm = TRUE),
+mean_score         = round(mean(score, na.rm = TRUE), 3),
+n_matches          = n(),
+n_centralization   = sum(dimension %in% c("centralization",
+"authority")),
+n_decentralization = sum(dimension %in% c("decentralization",
+"resistance")),
+n_loyalty          = sum(dimension == "governance"),
+n_resistance       = sum(dimension == "resistance"),
+n_royal_grace      = sum(dimension == "governance"),
+n_royal_punishment = sum(dimension == "coercion"),
+cent_decent_ratio  = round(n_centralization / (n_decentralization + 1), 2)
+)
+scores %>% kable(caption = "Sentiment scores across the full text")
+direction <- if (scores$total_score > 0) {
+"**centralizing** — language of royal authority dominates."
+} else if (scores$total_score < 0) {
+"**decentralizing** — language of resistance and noble autonomy dominates."
+} else {
+"**neutral** — centralizing and decentralizing language are balanced."
+}
+dim_counts <- matched %>%
+count(dimension, sentiment, sort = TRUE)
+dim_counts %>%
+kable(caption = "Matched tokens by dimension and sentiment")
+matched |>
+count(dimension) %>%
+ggplot(aes(x = reorder(dimension, n), y = n, fill = dimension)) +
+geom_col(show.legend = FALSE) +
+coord_flip() +
+labs(
+title    = "Lexicon dimension frequency",
+subtitle = "How often each thematic category appears in the text",
+x = NULL, y = "Token count"
+) +
+theme_minimal(base_size = 13)
+tibble(
+type  = c("Centralizing terms", "Decentralizing / resistant terms"),
+count = c(scores$n_centralization, scores$n_decentralization)
+) %>%
+ggplot(aes(x = type, y = count, fill = type)) +
+geom_col(width = 0.5, show.legend = FALSE) +
+scale_fill_manual(values = c("Centralizing terms"              = "#264653",
+"Decentralizing / resistant terms" = "#e9c46a")) +
+labs(
+title    = "Centralizing vs. Decentralizing vocabulary",
+subtitle = "Centralizing: centralization + authority | Decentralizing: decentralization + resistance",
+x = NULL, y = "Token count"
+) +
+theme_minimal(base_size = 13)
+tibble(
+type  = c("Loyalty to king", "Resistance to king"),
+count = c(scores$n_loyalty, scores$n_resistance)
+) %>%
+ggplot(aes(x = type, y = count, fill = type)) +
+geom_col(width = 0.5, show.legend = FALSE) +
+scale_fill_manual(values = c("Loyalty to king"    = "#2a9d8f",
+"Resistance to king" = "#e76f51")) +
+labs(
+title = "Loyalty vs. Resistance to the king",
+x = NULL, y = "Token count"
+) +
+theme_minimal(base_size = 13)
+matched %>%
+count(word, dimension, sort = TRUE) %>%
+slice_head(n = 30) %>%
+mutate(word = reorder(word, n)) %>%
+ggplot(aes(x = n, y = word, fill = dimension)) +
+geom_col() +
+labs(
+title = "Top 30 matched lexicon words",
+x = "Frequency", y = NULL, fill = "Dimension"
+) +
+theme_minimal(base_size = 12)
+matched %>%
+count(word, dimension, sentiment, score, sort = TRUE) %>%
+rename(frequency = n) %>%
+kable(caption = "All matched lexicon words and their frequencies")
+# Save all plots as PNG files
+ggsave("plot_dimensions.png",
+matched %>%
+count(dimension) %>%
+ggplot(aes(x = reorder(dimension, n), y = n, fill = dimension)) +
+geom_col(show.legend = FALSE) +
+coord_flip() +
+labs(title = "Lexicon dimension frequency",
+subtitle = "How often each thematic category appears in the text",
+x = NULL, y = "Token count") +
+theme_minimal(base_size = 13),
+width = 10, height = 6, dpi = 300)
+ggsave("plot_cent_vs_decent.png",
+tibble(
+type  = c("Centralizing terms", "Decentralizing / resistant terms"),
+count = c(scores$n_centralization, scores$n_decentralization)
+) %>%
+ggplot(aes(x = type, y = count, fill = type)) +
+geom_col(width = 0.5, show.legend = FALSE) +
+scale_fill_manual(values = c("Centralizing terms"              = "#264653",
+"Decentralizing / resistant terms" = "#e9c46a")) +
+labs(title    = "Centralizing vs. decentralizing vocabulary",
+subtitle = "Centralizing: centralization + authority | Decentralizing: decentralization + resistance",
+x = NULL, y = "Token count") +
+theme_minimal(base_size = 13),
+width = 10, height = 6, dpi = 300)
+ggsave("plot_loyalty_vs_resistance.png",
+tibble(
+type  = c("Loyalty to king", "Resistance to king"),
+count = c(scores$n_loyalty, scores$n_resistance)
+) %>%
+ggplot(aes(x = type, y = count, fill = type)) +
+geom_col(width = 0.5, show.legend = FALSE) +
+scale_fill_manual(values = c("Loyalty to king"    = "#2a9d8f",
+"Resistance to king" = "#e76f51")) +
+labs(title = "Loyalty vs. resistance to the king",
+x = NULL, y = "Token count") +
+theme_minimal(base_size = 13),
+width = 10, height = 6, dpi = 300)
+ggsave("plot_top_words.png",
+matched %>%
+count(word, dimension, sort = TRUE) %>%
+slice_head(n = 30) %>%
+mutate(word = reorder(word, n)) %>%
+ggplot(aes(x = n, y = word, fill = dimension)) +
+geom_col() +
+labs(title = "Top 30 matched lexicon words",
+x = "Frequency", y = NULL, fill = "Dimension") +
+theme_minimal(base_size = 12),
+width = 10, height = 8, dpi = 300)
+cat("Saved: plot_dimensions.png\n")
+cat("Saved: plot_cent_vs_decent.png\n")
+cat("Saved: plot_loyalty_vs_resistance.png\n")
+cat("Saved: plot_top_words.png\n")
