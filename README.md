@@ -5,6 +5,6 @@ Our results show that this is possible.
 
 Some of the data we used haven't been able to be uploaded to GitHub. The links to all of our data can be found in the relevant data-folders.
 
-Tobias Trøster - Tobiastroster@outlook.dk 
-Adrian Lüneborg - Adrian.luneborg@gmail.com
-Jakob Bie Andersen - Jako7647klarup@gmail.com
+Tobias Trøster: Tobiastroster@outlook.dk -
+Adrian Lüneborg: Adrian.luneborg@gmail.com -
+Jakob Bie Andersen: Jako7647klarup@gmail.com
