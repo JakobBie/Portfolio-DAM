@@ -1,0 +1,67 @@
+How we made the Lexicon 
+
+First we asked claude.ai this prompt : 
+
+Hey, I am want a custom sentiment lexicon for Rstudios.
+The theme is decentralization and centralization around the king and the kings power in denmark form 1560-1660. Make the list form the uploadet PDF.
+
+The PDF we uploadet was KB 1611-35.pdf, whict can be found in Final Project/Sentiment Analysis/Data/README
+
+The lexicon claude.ai made was not satisfactory on its own, the structur of the CSV file was good and it looks like the one we endete up using, the problem was some words like "konge" was in the wrong dimention.
+Based on the our knowledge form the subject in Kildeintroducerende emne: Danmark i 1500- og 1600-tallet, which was one of the other subject we had this semeter, we edited the lexcicon CSV file. 
+To make sure we that the lexicon coudt we be just to measure centralization and decentralization in Danish administrative sources across the period 1560-1660, 
+we had to verifife some words and to make sure we had all realevat words we aked Jeppe Büchert Netterstrøm.
+Lektor, Institut for Kultur og Samfund - Historie. https://pure.au.dk/portal/da/persons/hisjbn@cas.au.dk/
+This was the conversation that followed:
+
+Hej Jeppe
+
+Vi har valgt at arbejde videre med vores digitale miniprojekt til vores DAM eksamensprojekt. Emnet er centralisering af magten omkring kongen fra 1560-1660. 
+Vi bruger kancelliets brevbøger som kilde. Vi vil gerne lave noget ordsøgning for at se om der er en tendens til at kongen får mere magt / staten centraliseres, 
+og se om nogle af de andre magtspillere falder i indflydelse. Vi har lavet en liste over nogle ord man kunne søge efter, men vi vil meget gerne have dit input, 
+og eventuelt om der er nogle ord angående centralisering af staten og den militære revolution eller militære udvikling, du ville finde relevant.
+Stjernene(*) er ift. at vi i vores ord søgning søger på ordets stamme og alle de potentielle endelser der kan være til ordet, for at få en bredere søgning.
+Vores liste:
+Konge*
+Brev*
+Befal*
+Beskat*
+Kirke*
+Bisp*
+Sogn*
+Retterting* og eller herredag*
+Ting*
+Len*
+København eller Kbhvn
+Kansler*
+Hof*
+Rentemest*
+Rigsraad*
+Indkomst*
+*Foged*
+
+Mvh Adrian, Jakob og Trøster
+
+He answered:
+
+Hej alle
+Fedt projekt! Måske finde nogle flere ord for afgifter (told, konsumption, accise, cise); 
+landsting (stigende central indgriben i landstingenes virksomhed?); 
+stænderforsamling (eller lign.), landkommissær (som udtryk for begrænsning af stat); div. militære udtryk som kan indikere vækst i militær-/magtstat.
+Evt. landgilde (og andre udtryk vedr. godsdrift, fx herlighed; som kontrapunkt til evt stigning i udtryk for statslige skatter og afgifter; 
+forventningen er at "landgilde" er mere stabil fordi der ikke ændres så meget på afgifter ifm godsdrift som på statsskatter).
+
+Generelt vil det vel også være relevant at sammenholde med udvikling i samlet mængde af breve/sider i KB (for at udelukke at en stigning i et bestemt ord blot skyldes øget kildemængde); der er tidligere lavet optællinger heraf (så vidt jeg husker antal sider), vistnok i Dansk forvaltningshistorie (Leon Jespersen eller Knud JV Jespersen, husker det ikke); eller måske i en artikel om KB (vistnok af Ole Degn) i denne publikation, som jeg i det hele taget husker som god:
+
+Kildeudgivelse og kildebenyttelse. Kildeskriftselskabet 1877-2002. Red.: Gunner Lind. Selskabet for Udgivelse af Kilder til Dansk Historie, København, 2002.
+Jeg ville nok være forsigtig med at anse fluktuationer i "kirke" som udtryk for ret meget ift. stat, 
+fordi kirken var underlagt staten og dermed ikke en seævstændig magtspiller.
+Det var bare nogle hurtige skud fra hoften.
+
+Vh
+Jeppe
+
+With Jeppes adwise in mind we added his words to the lexicon and rewoved words like "kirke".
+
+That is how we ended up with the lexicon we enden up jusing. 
+
