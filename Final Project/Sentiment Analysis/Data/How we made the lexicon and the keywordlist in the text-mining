@@ -2,7 +2,7 @@ How we made the Lexicon
 
 First we asked claude.ai this prompt : 
 
-Hey, I am want a custom sentiment lexicon for Rstudios.
+Hey, I want a custom sentiment lexicon for Rstudios.
 The theme is decentralization and centralization around the king and the kings power in denmark form 1560-1660. Make the list form the uploadet PDF.
 
 The PDF we uploadet was KB 1611-35.pdf, whict can be found in Final Project/Sentiment Analysis/Data/README
